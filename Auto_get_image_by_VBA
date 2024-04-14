@@ -1,0 +1,64 @@
+# Function để get 1 ảnh
+Sub GetImage()
+Dim ws As Worksheet
+Dim imgFolderPath As String, imgPath As String
+Dim pic As Shape
+Dim i As Integer, j As Long, k As Integer, maxSize As Long
+Dim picLeft As Long, picTop As Long, picWidth As Long, picHeight As Long
+ 
+Set ws = ThisWorkbook.ActiveSheet
+j = ActiveCell.Row
+imgFolderPath = "E:\ExcelVBA\Project_1\CarData"
+imgPath = imgFolderPath & "\" & Cells(j, 4).Value & ".png"
+picLeft = ActiveCell.Left
+picTop = ActiveCell.Top
+picHeight = ActiveCell.Height
+picWidth = ActiveCell.Width
+
+Set pic = ws.Shapes.AddPicture(imgPath, msoFalse, msoTrue, picLeft, picTop, picWidth, picHeight)
+pic.Visible = msoTrue
+pic.Placement = xlMoveAndSize
+    
+If pic.Name = Null Then GoTo Tiep
+    i = Selection.Height
+    k = Selection.Width
+Tiep:
+Set pic = Nothing
+
+maxSize = 0
+If i >= k Then
+    maxSize = i
+Else
+    maxSize = k
+End If
+
+If maxSize = 0 Then
+    ActiveCell.Value = "Error! Folder Image KHONG ton tai, hoac vi tri file tool KHONG dung"
+    Exit Sub
+End If
+ws.Rows(j).Select
+Selection.RowHeight = maxSize
+End Sub
+
+# Function để get toàn bộ danh sách
+Sub GetAllImage()
+Dim i As Integer, conf As Integer
+Dim lRow As Integer
+Dim ws As Worksheet
+ 
+Application.ScreenUpdating = False
+ 
+conf = MsgBox("Confirm Get All Image ?", vbYesNo, "Information")
+If conf = vbNo Then Exit Sub
+ 
+Set ws = ThisWorkbook.ActiveSheet
+lRow = ws.Cells(ws.Rows.Count, "D").End(xlUp).Row
+For i = 3 To lRow
+    ws.Cells(i, 8).Select
+    If ws.Cells(i, 3) <> "" Then Call GetImage
+Next i
+Application.ScreenUpdating = True
+MsgBox "Get All Image Completed", , "Hoan thanh"
+ws.Cells(1, 1).Select
+ 
+End Sub
