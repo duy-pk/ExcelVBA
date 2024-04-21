@@ -1,0 +1,38 @@
+Sub GetDataFromFiles()
+Dim OpenFiles
+Dim wb, ws As Worksheet
+Dim xpath As String
+Dim i As Integer, lRow As Integer
+    
+Application.ScreenUpdating = Falsea
+Set ws = ThisWorkbook.ActiveSheet
+
+OpenFiles = Application.GetOpenFilename _
+    (FileFilter:="All Files, *.*", MultiSelect:=True, Title:="Select Files to Merge")
+
+If TypeName(OpenFiles) = "Boolean" Then
+    MsgBox "Ban chua chon file nao! Thoat", , "Thong Bao"
+    Exit Sub
+End If
+
+For i = 1 To UBound(OpenFiles)
+    lRow = ws.Range("C" & Rows.Count).End(xlUp).Row
+    Workbooks.OpenText fileName:=OpenFiles(i), Origin _
+        :=xlWindows, StartRow:=1, DataType:=xlDelimited, TextQualifier:= _
+        xlDoubleQuote, ConsecutiveDelimiter:=False, Tab:=True, Semicolon:=False, _
+        Comma:=False, Space:=False, Other:=False, FieldInfo:=Array(1, 1), _
+        TrailingMinusNumbers:=True
+    Range("B2").Select
+    Range(Selection, Selection.End(xlDown)).Select
+    Range(Selection, Selection.End(xlToRight)).Select
+    Selection.Copy
+    ws.Range("C" & lRow + 1).PasteSpecial Paste:=xlPasteValues, Operation:=xlNone, SkipBlanks _
+        :=False, Transpose:=False
+    Application.DisplayAlerts = False
+    ActiveWindow.Close
+    Application.DisplayAlerts = True
+Next i
+ws.Range("B2").Select
+Application.ScreenUpdating = True
+
+End Sub
